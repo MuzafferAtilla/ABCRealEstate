@@ -7,6 +7,9 @@ import { ProductSaleTypeCategory } from './product.sale.type.category';
 import { ProductSearchPipe } from "./product-search.pipe";
 import { FormsModule } from '@angular/forms';
 import { ProductService } from './services/product.service';
+import { NgxPaginationModule } from 'ngx-pagination';
+
+
 
 
 
@@ -15,7 +18,7 @@ import { ProductService } from './services/product.service';
   standalone: true,
   templateUrl: './product.component.html',
   styleUrl: './product.component.css',
-  imports: [CommonModule, ProductSearchPipe, FormsModule],
+  imports: [CommonModule, ProductSearchPipe, FormsModule, NgxPaginationModule],
   providers: [ProductService]
 })
 export class ProductComponent implements OnInit {
@@ -31,6 +34,16 @@ export class ProductComponent implements OnInit {
       this.productsStage = data
     });
   }
+  onTableDataChange(event: any) {
+    this.page = event
+    this.getProducts()
+  }
+  onTableSizeChange(event: any): void{
+    this.tableSize = event.target.value
+    this.page = 1
+    this.getProducts()
+
+  }
   title = "Ürün Listesi"
   searchText = ""
   minPrice = null
@@ -40,13 +53,15 @@ export class ProductComponent implements OnInit {
   selectedItemsProductAge: string[] = [];
   selectedItemsRoomType: string[] = [];
   selectedItemsSaleType: string[] = [];
-
+  page: number = 1;
+  count: number = 0;
+  tableSize: number = 4;
+  tableSizes: [4, 8, 20, 50];
 
 
 
 
   productAgeCategories: ProductAgeCategory[] = [
-    { id: 1, value: "Tümü" },
     { id: 2, value: "1" },
     { id: 3, value: "5" },
     { id: 4, value: "10" },
@@ -55,7 +70,6 @@ export class ProductComponent implements OnInit {
   ]
 
   productRoomTypeCategories: ProductRoomTypeCategory[] = [
-    { id: 1, value: "Tümü" },
     { id: 2, value: "1+1" },
     { id: 3, value: "2+1" },
     { id: 4, value: "3+1" },
@@ -64,25 +78,21 @@ export class ProductComponent implements OnInit {
   ]
 
   productSaleTypeCategories: ProductSaleTypeCategory[] = [
-    { id: 1, value: "Tümü" },
     { id: 2, value: "Satilik" },
     { id: 3, value: "Kiralik" }
   ]
 
-  maxmin(e: any){
-console.log(e,'eee')
-  }
 
   filterChange(value: string, e: any) {
     if (value == "filterAgain") {
       this.products = this.productsStage
-      if(this.selectedItemsProductAge.length > 0) {
+      if (this.selectedItemsProductAge.length > 0) {
         this.products = this.products.filter(m => this.selectedItemsProductAge.includes(m.productAge.toString()))
       }
-      if(this.selectedItemsRoomType.length > 0) {
+      if (this.selectedItemsRoomType.length > 0) {
         this.products = this.products.filter(m => this.selectedItemsRoomType.includes(m.roomType.toString()))
       }
-      if(this.selectedItemsSaleType.length > 0) {
+      if (this.selectedItemsSaleType.length > 0) {
         this.products = this.products.filter(m => this.selectedItemsSaleType.includes(m.saleType.toString()))
       }
     }
@@ -115,7 +125,7 @@ console.log(e,'eee')
             this.selectedItemsProductAge.splice(index, 1);
           }
         }
-  
+
         item = this.productRoomTypeCategories.find(m => m.value == value)?.value!
         if (item !== null && item !== undefined) {
           let index = this.selectedItemsRoomType.indexOf(item)

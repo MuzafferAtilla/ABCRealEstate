@@ -3,7 +3,23 @@
       <span class="input-group-text" id="basic-addon1">ABC Real Estate</span>
       <input type="text" class="form-control" [(ngModel)]="searchText" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1">
     </div>
+    <div class="container text-center">
+      <div class="row align-items-start">
+
+        <div class="col">
+          <pagination-controls
+          previousLabel="prev"
+          nextLabel="next"
+          (pageChange)="onTableDataChange($event)">
+     
+    </pagination-controls>
+
+        </div>
+      </div>
+    </div>
+
 </nav>
+
 <div class="row">
   <div class="col-md-2">
     <h6>Fiyat Aralığı</h6>
@@ -11,12 +27,11 @@
     <input type="text" [(ngModel)]="minPrice" class="form-control" placeholder="Minimum" aria-label="Minimum">
 </div>
 <div class="input-group mb-3">
-    <input type="text" [(ngModel)]="maxPrice" class="form-control" placeholder="Maksimum" aria-label="Maksimum" (change)="maxmin($event)">
+    <input type="text" [(ngModel)]="maxPrice" class="form-control" placeholder="Maksimum" aria-label="Maksimum">
 </div>
 <p></p>
 <h6>Yapı Yaşı</h6>
 <div *ngFor="let productAge of productAgeCategories" class="form-check">
-    <input *ngIf="productAge.value == 'Tümü'" class="form-check-input" type="checkbox" value="a" id="productAge" (change)="filterChange(productAge.value,$event)" checked>
     <input *ngIf="productAge.value !== 'Tümü'" class="form-check-input" type="checkbox" value="a" id="productAge" (change)="filterChange(productAge.value,$event)">
     <label class="form-check-label" for="flexCheckDefault">
       {{productAge.value}}
@@ -25,7 +40,6 @@
 <p></p>
 <h6>Oda Türü</h6>
 <div *ngFor="let roomType of productRoomTypeCategories" class="form-check">
-    <input *ngIf="roomType.value == 'Tümü'" class="form-check-input" type="checkbox" value="" id="roomType" (change)="filterChange(roomType.value,$event)" checked>
     <input *ngIf="roomType.value !== 'Tümü'" class="form-check-input" type="checkbox" value="" id="roomType" (change)="filterChange(roomType.value,$event)">
     <label class="form-check-label" for="flexCheckDefault">
       {{roomType.value}}
@@ -34,7 +48,6 @@
 <p></p>
 <h6>İlan Türü</h6>
 <div *ngFor="let saleType of productSaleTypeCategories" class="form-check">
-    <input *ngIf="saleType.value == 'Tümü'"class="form-check-input" type="checkbox" value="" id="saleType" (change)="filterChange(saleType.value,$event)" checked>
     <input *ngIf="saleType.value !== 'Tümü'"class="form-check-input" type="checkbox" value="" id="saleType" (change)="filterChange(saleType.value,$event)">
     <label class="form-check-label" for="flexCheckDefault">
       {{saleType.value}}
@@ -43,7 +56,11 @@
   </div>
   <div class="col-md-10">
       <div class="row">
-      <div *ngFor="let product of products | productSearch:searchText:minPrice??0:maxPrice??0" class="card" style="width: 40rem; height: 50rem;">
+      <div *ngFor="let product of products | productSearch:searchText:minPrice??0:maxPrice??0 | paginate: {
+        itemsPerPage: tableSize,
+        currentPage: page,
+        totalItems: count
+      }; let i = index" class="card" style="width: 40rem; height: 50rem;">
         <h5 class="card-title">{{product.productName}}</h5>
 
           <img [src]="product.photoUrl">
